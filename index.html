@@ -90,8 +90,8 @@
             t.r = t.g = t.b = '';
             t.stop = false;
 
-            t.startGame = function(){
-                if(t.start != false) return;
+            t.startGame = function(keep){
+                if(t.start !== false && keep === undefined) return;
                 
                 if(t.stop)
                     if(confirm('재시작 할까요?')) t.init();
@@ -126,7 +126,7 @@
                         alert('축하합니다.\n당신은 컬러 마스터 입니다!');
                     }else{
                         t.quizIdx++;
-                        t.startGame();
+                        t.startGame(true);
                     }
                 }else{
                     colors.querySelectorAll('div')[t.otherColorIdx].classList.add('correct');   //정답 표기
@@ -144,6 +144,7 @@
             }
 
             t.init = function(){
+                colors.querySelectorAll('div')[t.otherColorIdx].classList.remove('correct');
                 t.start = t.end = t.stop = false;
                 t.otherColorIdx = t.quizIdx = 0;
                 t.r = t.g = t.b = '';
