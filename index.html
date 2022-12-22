@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>color</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="./assets/css/normalize.css">
+</head>
+<style>
+    @font-face {
+        font-family: 'UhBeeDongKyung';  /*어비동경체*/
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_five@.2.0/UhBeeDongKyung.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    /* body{font-family: 'UhBeeDongKyung';} */
+    body{display: flex; align-items: center; justify-content: center;}
+    .wrapper{width: 280px;}
+
+    header{padding: 10px; text-align: right;}
+    header button{outline: 0; border: 0; border-radius: 3px; width: 80px; padding: 5px; box-sizing: border-box; color: #fff; font-weight: 900;}
+    .init{background: red;}
+    .start{background: blue;}
+
+
+    .colors{padding: 5px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; width: 280px;}
+    .colors > div{width: 45px; height:45px; margin-right: 5px; border-radius: 50%; margin-bottom: 5px;}
+    .colors > div:nth-child(5n){margin-right: 0;}
+    .colors > div:nth-child(n + 21){margin-bottom: 0;}
+
+    .correct{animation: big .2s infinite ease-in-out alternate;}
+
+    @keyframes big{
+        100%{transform: scale(1.2);}
+    }
+
+</style>
+<body>
+    <div class="wrapper">
+        <header>
+            <button class="init" onclick="colorGame.reload();">초기화</button>
+            <button class="start" onclick="colorGame.startGame();">시작</button>
+        </header>
+        <div>
+            <h3><span id="qIdx">1.</span> 다른 색을 고르세요.</h3>
+    
+            <div id="colors" class="colors">
+                <div onclick="colorGame.answer(0)"></div>
+                <div onclick="colorGame.answer(1)"></div>
+                <div onclick="colorGame.answer(2)"></div>
+                <div onclick="colorGame.answer(3)"></div>
+                <div onclick="colorGame.answer(4)"></div>
+                <div onclick="colorGame.answer(5)"></div>
+                <div onclick="colorGame.answer(6)"></div>
+                <div onclick="colorGame.answer(7)"></div>
+                <div onclick="colorGame.answer(8)"></div>
+                <div onclick="colorGame.answer(9)"></div>
+                <div onclick="colorGame.answer(10)"></div>
+                <div onclick="colorGame.answer(11)"></div>
+                <div onclick="colorGame.answer(12)"></div>
+                <div onclick="colorGame.answer(13)"></div>
+                <div onclick="colorGame.answer(14)"></div>
+                <div onclick="colorGame.answer(15)"></div>
+                <div onclick="colorGame.answer(16)"></div>
+                <div onclick="colorGame.answer(17)"></div>
+                <div onclick="colorGame.answer(18)"></div>
+                <div onclick="colorGame.answer(19)"></div>
+                <div onclick="colorGame.answer(20)"></div>
+                <div onclick="colorGame.answer(21)"></div>
+                <div onclick="colorGame.answer(22)"></div>
+                <div onclick="colorGame.answer(23)"></div>
+                <div onclick="colorGame.answer(24)"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const qs = function(t){return document.querySelector(t);}
+        const qsa = function(t){return document.querySelectorAll(t);}
+        
+        const colorGame = new Color();
+
+        function Color(){
+            const t = this;
+            t.start = false;
+            t.end = false;
+            t.quizIdx = 0;
+            t.otherColorIdx = 0;
+            t.r = t.g = t.b = '';
+            t.stop = false;
+
+            t.startGame = function(){
+                if(t.start != false) return;
+                
+                if(t.stop)
+                    if(confirm('재시작 할까요?')) t.init();
+                    else return;
+                
+                t.start = '123';
+
+                t.r = getRandomNum(50, 200);
+                t.g = getRandomNum(50, 200);
+                t.b = getRandomNum(50, 200);
+
+                const qIdx = qs('#qIdx');
+                const colors = qs('#colors');
+
+                qIdx.innerText = (t.quizIdx + 1) + '.';
+
+                colors.querySelectorAll('div').forEach(function(color){
+                    color.style.background = setColor(t.r, t.g, t.b);
+                });
+
+                t.otherColorIdx = getRandomNum(0, 24);
+
+                colors.querySelectorAll('div')[t.otherColorIdx].style.background = setOtherColor(t.r, t.g, t.b, (20 - t.quizIdx));
+            }
+
+
+            t.answer = function(idx){
+                if(t.stop === true) return;
+
+                if(idx == t.otherColorIdx){
+                    if(t.quizIdx == 19){
+                        alert('축하합니다.\n당신은 컬러 마스터 입니다!');
+                    }else{
+                        t.quizIdx++;
+                        t.startGame();
+                    }
+                }else{
+                    colors.querySelectorAll('div')[t.otherColorIdx].classList.add('correct');   //정답 표기
+
+                    t.stop = true;
+                    t.start = false;
+
+                    if(confirm('현재: ' +(t.quizIdx + 1) + '단계\n\n' + '처음부터 다시 진행할까요?')){
+                        t.init();
+                        t.startGame();
+                    }else{
+
+                    }
+                }
+            }
+
+            t.init = function(){
+                t.start = t.end = t.stop = false;
+                t.otherColorIdx = t.quizIdx = 0;
+                t.r = t.g = t.b = '';
+            }
+
+            t.reload = function(){
+                if(confirm('페이지를 다시 불러올까요?')) location.reload();
+            }
+
+        }
+
+        function setOtherColor(r, g, b, val){
+            const valArr = [-val, val];
+            const addVal = valArr[getRandomNum(0, 1)];
+
+            return 'rgb(' + (r + addVal) + ', ' + (g + addVal) + ', ' + (b + addVal) + ')';
+        }
+
+        function getRandomNum(mn, mx){return Math.floor(Math.random() * (mx - mn + 1)) + mn;};
+
+        function setColor(r, g, b){return 'rgb(' + r + ', ' + g + ', ' + b + ')';}
+    </script>
+
+
+
+</body>
+</html>
