@@ -118,7 +118,8 @@
                     if(confirm('재시작 할까요?')) t.init();
                     else return;
                 
-                t.start = new Date().getTime();
+
+                if(!t.start) t.start = new Date().getTime();
 
                 qs('#colors').classList.add('on');
                 qs('#guide').innerText = '이 중 다른 색을 찾아주세요.';
