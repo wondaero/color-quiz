@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>color</title>
+    <title>군계일학 feat.coloR</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no" />
     <link rel="stylesheet" href="./assets/css/normalize.css">
 </head>
@@ -14,6 +14,8 @@
         font-style: normal;
     }
 
+    /* body{opacity:.5;} */
+
     /* body{font-family: 'UhBeeDongKyung';} */
     body{display: flex; align-items: center; justify-content: center;}
     .wrapper{width: 280px;}
@@ -23,18 +25,27 @@
     .init{background: red;}
     .start{background: blue;}
 
+    .content{position: relative;}
 
-    .colors{padding: 5px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; width: 280px;}
-    .colors > div{width: 45px; height:45px; margin-right: 5px; border-radius: 50%; margin-bottom: 5px;}
+
+    .colors{display: none; align-items: center; justify-content: center; flex-wrap: wrap; width: 280px;}
+    .colors.on{display: flex;}
+    .colors > div{
+        width: 52px; height:52px; margin-right: 5px; border-radius: 50%; margin-bottom: 5px;
+        transform: border 1s ease-in, color 1s ease-in; cursor: pointer;
+    }
     .colors > div:nth-child(5n){margin-right: 0;}
     .colors > div:nth-child(n + 21){margin-bottom: 0;}
 
-    .correct{animation: big .2s infinite ease-in-out alternate;}
+    .colors > div.correct{border-radius: 0;}
 
-    @keyframes big{
-        100%{transform: scale(1.2);}
-    }
+    aside{position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #000; display: none; align-items: center; justify-content: center;}
+    aside.on{display: flex;}
 
+    aside > div{width: 250px; text-align: cener;}
+    aside h3, aside h4{color: #fff;}
+    aside .color-deco{display: flex; align-items: center; justify-content: flex-start;}
+    aside .color-deco > div{width: 10px; height: 20px;}
 </style>
 <body>
     <div class="wrapper">
@@ -42,8 +53,8 @@
             <button class="init" onclick="colorGame.reload();">초기화</button>
             <button class="start" onclick="colorGame.startGame();">시작</button>
         </header>
-        <div>
-            <h3><span id="qIdx">1.</span> 다른 색을 고르세요.</h3>
+        <div class="content">
+            <h3 class=""><span id="qIdx">1.</span> <span id="guide">시작버튼을 눌러주세요.</span></h3>
     
             <div id="colors" class="colors">
                 <div onclick="colorGame.answer(0)"></div>
@@ -72,6 +83,14 @@
                 <div onclick="colorGame.answer(23)"></div>
                 <div onclick="colorGame.answer(24)"></div>
             </div>
+
+            <aside>
+                <div>
+                    <h3>Stage <span id="stageNum"></span></h3>
+                    <h4>소요시간: <span id="dur"></span></h4>
+                    <div id="colorDeco" class="color-deco"></div>
+                </div>
+            </aside>
         </div>
     </div>
 
@@ -90,6 +109,8 @@
             t.r = t.g = t.b = '';
             t.stop = false;
 
+            t.history = [];
+
             t.startGame = function(keep){
                 if(t.start !== false && keep === undefined) return;
                 
@@ -97,7 +118,10 @@
                     if(confirm('재시작 할까요?')) t.init();
                     else return;
                 
-                t.start = '123';
+                t.start = new Date().getTime();
+
+                qs('#colors').classList.add('on');
+                qs('#guide').innerText = '이 중 다른 색을 찾아주세요.';
 
                 t.r = getRandomNum(50, 200);
                 t.g = getRandomNum(50, 200);
@@ -121,33 +145,56 @@
             t.answer = function(idx){
                 if(t.stop === true) return;
 
+                const colors = qs('#colors');
+
                 if(idx == t.otherColorIdx){
                     if(t.quizIdx == 19){
                         alert('축하합니다.\n당신은 컬러 마스터 입니다!');
                     }else{
+                        t.history.push({
+                            color1: setColor(t.r, t.g, t.b),
+                            color2: colors.querySelectorAll('div')[t.otherColorIdx].style.background,
+                            time: new Date().getTime() - t.start
+                        });
+
                         t.quizIdx++;
                         t.startGame(true);
                     }
                 }else{
                     colors.querySelectorAll('div')[t.otherColorIdx].classList.add('correct');   //정답 표기
-
+                    
                     t.stop = true;
                     t.start = false;
+                    
+                    qs('aside').classList.add('on');
+                    qs('#stageNum').innerText = t.quizIdx > 0 ? t.history.length : '없음';
+                    qs('#dur').innerText = t.quizIdx > 0 ? (t.history[t.history.length - 1].time / 1000) + '초' : '없음';
 
-                    if(confirm('현재: ' +(t.quizIdx + 1) + '단계\n\n' + '처음부터 다시 진행할까요?')){
-                        t.init();
-                        t.startGame();
-                    }else{
 
-                    }
+                    qs('#colorDeco').innerHTML = '';
+                    t.history.forEach(function(el){
+                        const div = document.createElement('div');
+                        div.style.cssText = 'background: linear-gradient(to bottom, ' + el.color1 + ' 50%, ' + el.color2 + ' 0)';
+                        qs('#colorDeco').appendChild(div);
+
+                    })
+
+                    // if(confirm('처음부터 다시 진행할까요?')){
+                    //     t.init();
+                    //     t.startGame();
+                    // }else{
+
+                    // }
                 }
             }
 
             t.init = function(){
                 colors.querySelectorAll('div')[t.otherColorIdx].classList.remove('correct');
+                qs('aside').classList.remove('on');
                 t.start = t.end = t.stop = false;
                 t.otherColorIdx = t.quizIdx = 0;
                 t.r = t.g = t.b = '';
+                t.history = [];
             }
 
             t.reload = function(){
