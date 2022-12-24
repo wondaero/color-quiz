@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <title>군계일학 feat.coloR</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no" />
-    <!-- <link rel="stylesheet" href="./assets/css/normalize.css"> -->
-    <link rel="stylesheet" href="https://wondaero.github.io/color-quiz/assets/css/normalize.css">
+    <link rel="stylesheet" href="./assets/css/normalize.css">
+    <!-- <link rel="stylesheet" href="https://wondaero.github.io/color-quiz/assets/css/normalize.css"> -->
 </head>
 <style>
     @font-face {
@@ -21,7 +21,7 @@
     body{display: flex; align-items: center; justify-content: center;}
     .wrapper{width: 280px;}
 
-    header{padding: 10px; text-align: right;}
+    header{padding: 10px 0; text-align: right;}
     header button{outline: 0; border: 0; border-radius: 3px; width: 80px; padding: 5px; box-sizing: border-box; color: #fff; font-weight: 900;}
     .init{background: red;}
     .start{background: blue;}
@@ -40,16 +40,18 @@
 
     .colors > div.correct{border-radius: 0;}
 
-    aside{position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #000; display: none; align-items: center; justify-content: center;}
+    aside{position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #fff; display: none; align-items: center; justify-content: center;}
     aside.on{display: flex;}
 
-    aside > div{width: 250px; text-align: cener;}
+    aside > div{width: 250px; text-align: center; }
     aside h2{display: none;}
     aside h2.on{display: block;}
-    aside h2, aside h3, aside h4{color: #fff;}
     aside .color-deco{position: relative; height: 50px;}
     aside .color-deco > div{width: 50px; height: 50px; border-radius: 50%; position: absolute; top: 0; display: flex; align-items: center; justify-content: center;}
-    aside .color-deco > div > div{width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff;}
+    aside .color-deco > div > div{
+        width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900;
+        text-shadow: 0 0 0px rgba(0, 0, 0, .5);
+    }
 </style>
 <body>
     <div class="wrapper">
@@ -90,7 +92,7 @@
 
             <aside>
                 <div>
-                    <h1 id="colorMaster">당신은 컬러마스터!</h1>
+                    <h2 id="colorMaster">당신은 컬러마스터!</h2>
                     <h3>Stage <span id="stageNum"></span></h3>
                     <h4>소요시간: <span id="dur"></span></h4>
                     <div id="colorDeco" class="color-deco"></div>
@@ -185,7 +187,7 @@
                         t.startGame(true);
                     }
                 }else{
-                    colors.querySelectorAll('div')[t.otherColorIdx].classList.add('correct');   //정답 표기
+                    // colors.querySelectorAll('div')[t.otherColorIdx].classList.add('correct');   //정답 표기
                     
                     t.stop = true;
                     t.start = false;
@@ -200,7 +202,7 @@
                         const div = document.createElement('div');
                         const div2 = document.createElement('div');
                         div.style.cssText = 'background: linear-gradient(-45deg, ' + el.color1 + ', #fff); left:' + (idx * 10) + 'px;';
-                        div2.style.cssText = 'background: linear-gradient(135deg, ' + el.color1 + ', #fff);';
+                        div2.style.cssText = 'background: linear-gradient(135deg, ' + el.color1 + ', #fff); color: ' + el.color2 + ';';
                         div2.innerHTML = (idx + 1);
                         qs('#colorDeco').appendChild(div);
                         div.appendChild(div2);
@@ -215,7 +217,7 @@
             }
 
             t.init = function(){
-                colors.querySelectorAll('div')[t.otherColorIdx].classList.remove('correct');
+                // colors.querySelectorAll('div')[t.otherColorIdx].classList.remove('correct');
                 qs('aside').classList.remove('on');
                 qs('#colors').classList.add('on');
 
