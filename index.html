@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <title>군계일학 feat.coloR</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no" />
-    <link rel="stylesheet" href="./assets/css/normalize.css">
+    <!-- <link rel="stylesheet" href="./assets/css/normalize.css"> -->
+    <link rel="stylesheet" href="https://wondaero.github.io/color-quiz/assets/css/normalize.css">
 </head>
 <style>
     @font-face {
@@ -43,9 +44,12 @@
     aside.on{display: flex;}
 
     aside > div{width: 250px; text-align: cener;}
-    aside h3, aside h4{color: #fff;}
-    aside .color-deco{display: flex; align-items: center; justify-content: flex-start;}
-    aside .color-deco > div{width: 10px; height: 20px;}
+    aside h2{display: none;}
+    aside h2.on{display: block;}
+    aside h2, aside h3, aside h4{color: #fff;}
+    aside .color-deco{position: relative; height: 50px;}
+    aside .color-deco > div{width: 50px; height: 50px; border-radius: 50%; position: absolute; top: 0; display: flex; align-items: center; justify-content: center;}
+    aside .color-deco > div > div{width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff;}
 </style>
 <body>
     <div class="wrapper">
@@ -86,6 +90,7 @@
 
             <aside>
                 <div>
+                    <h1 id="colorMaster">당신은 컬러마스터!</h1>
                     <h3>Stage <span id="stageNum"></span></h3>
                     <h4>소요시간: <span id="dur"></span></h4>
                     <div id="colorDeco" class="color-deco"></div>
@@ -149,15 +154,33 @@
                 const colors = qs('#colors');
 
                 if(idx == t.otherColorIdx){
-                    if(t.quizIdx == 19){
-                        alert('축하합니다.\n당신은 컬러 마스터 입니다!');
-                    }else{
-                        t.history.push({
-                            color1: setColor(t.r, t.g, t.b),
-                            color2: colors.querySelectorAll('div')[t.otherColorIdx].style.background,
-                            time: new Date().getTime() - t.start
+                    t.history.push({
+                        color1: setColor(t.r, t.g, t.b),
+                        color2: colors.querySelectorAll('div')[t.otherColorIdx].style.background,
+                        time: new Date().getTime() - t.start
+                    });
+                    if(t.quizIdx == 19){    //20문제 다 풀음
+                        t.stop = true;
+                        t.start = false;
+                        
+                        qs('aside').classList.add('on');
+                        qs('#colorMaster').classList.add('on');
+                        qs('#stageNum').innerText = t.quizIdx > 0 ? t.history.length : '없음';
+                        qs('#dur').innerText = t.quizIdx > 0 ? (t.history[t.history.length - 1].time / 1000) + '초' : '없음';
+
+
+                        qs('#colorDeco').innerHTML = '';
+                        t.history.forEach(function(el, idx){
+                            const div = document.createElement('div');
+                            const div2 = document.createElement('div');
+                            div.style.cssText = 'background: linear-gradient(-45deg, ' + el.color1 + ', #fff); left:' + (idx * 10) + 'px;';
+                            div2.style.cssText = 'background: linear-gradient(135deg, ' + el.color1 + ', #fff);';
+                            div2.innerHTML = (idx + 1);
+                            qs('#colorDeco').appendChild(div);
+                            div.appendChild(div2);
                         });
 
+                    }else{
                         t.quizIdx++;
                         t.startGame(true);
                     }
@@ -173,13 +196,15 @@
 
 
                     qs('#colorDeco').innerHTML = '';
-                    t.history.forEach(function(el){
+                    t.history.forEach(function(el, idx){
                         const div = document.createElement('div');
-                        div.style.cssText = 'background: linear-gradient(to bottom, ' + el.color1 + ' 50%, ' + el.color2 + ' 0)';
+                        const div2 = document.createElement('div');
+                        div.style.cssText = 'background: linear-gradient(-45deg, ' + el.color1 + ', #fff); left:' + (idx * 10) + 'px;';
+                        div2.style.cssText = 'background: linear-gradient(135deg, ' + el.color1 + ', #fff);';
+                        div2.innerHTML = (idx + 1);
                         qs('#colorDeco').appendChild(div);
-
-                    })
-
+                        div.appendChild(div2);
+                    });
                     // if(confirm('처음부터 다시 진행할까요?')){
                     //     t.init();
                     //     t.startGame();
@@ -192,6 +217,8 @@
             t.init = function(){
                 colors.querySelectorAll('div')[t.otherColorIdx].classList.remove('correct');
                 qs('aside').classList.remove('on');
+                qs('#colors').classList.add('on');
+
                 t.start = t.end = t.stop = false;
                 t.otherColorIdx = t.quizIdx = 0;
                 t.r = t.g = t.b = '';
