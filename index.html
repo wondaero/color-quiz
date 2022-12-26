@@ -15,7 +15,7 @@
         font-style: normal;
     }
 
-    /* body{opacity:.5;} */
+    body{opacity:.05;}
 
     /* body{font-family: 'UhBeeDongKyung';} */
     body{display: flex; align-items: center; justify-content: center;}
@@ -27,6 +27,7 @@
     .start{background: blue;}
 
     .content{position: relative;}
+    .content h3{margin: 0; margin-bottom: 10px;}
 
 
     .colors{display: none; align-items: center; justify-content: center; flex-wrap: wrap; width: 280px;}
@@ -40,18 +41,21 @@
 
     .colors > div.correct{border-radius: 0;}
 
-    aside{position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #fff; display: none; align-items: center; justify-content: center;}
+    aside{position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #fff; display: none; justify-content: center;}
     aside.on{display: flex;}
 
     aside > div{width: 250px; text-align: center; }
-    aside h2{display: none;}
+    aside h2{display: none; margin: 0; margin-bottom: 5px;}
     aside h2.on{display: block;}
-    aside .color-deco{position: relative; height: 50px;}
-    aside .color-deco > div{width: 50px; height: 50px; border-radius: 50%; position: absolute; top: 0; display: flex; align-items: center; justify-content: center;}
-    aside .color-deco > div > div{
+    aside h3, aside h4{margin: 0; margin-bottom: 5px;}
+    aside h4{margin-bottom: 20px;}
+    aside .color-tokens{position: relative; height: 50px;}
+    aside .color-tokens > div{width: 50px; height: 50px; border-radius: 50%; position: absolute; top: 0; display: flex; align-items: center; justify-content: center;}
+    aside .color-tokens > div > div{
         width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900;
         text-shadow: 0 0 0px rgba(0, 0, 0, .5);
     }
+
 </style>
 <body>
     <div class="wrapper">
@@ -95,7 +99,7 @@
                     <h2 id="colorMaster">당신은 컬러마스터!</h2>
                     <h3>Stage <span id="stageNum"></span></h3>
                     <h4>소요시간: <span id="dur"></span></h4>
-                    <div id="colorDeco" class="color-deco"></div>
+                    <div id="colorTokens" class="color-tokens"></div>
                 </div>
             </aside>
         </div>
@@ -131,9 +135,9 @@
                 qs('#colors').classList.add('on');
                 qs('#guide').innerText = '이 중 다른 색을 찾아주세요.';
 
-                t.r = getRandomNum(50, 200);
-                t.g = getRandomNum(50, 200);
-                t.b = getRandomNum(50, 200);
+                t.r = getRandomNum(80, 180);
+                t.g = getRandomNum(80, 180);
+                t.b = getRandomNum(80, 180);
 
                 const qIdx = qs('#qIdx');
                 const colors = qs('#colors');
@@ -146,7 +150,7 @@
 
                 t.otherColorIdx = getRandomNum(0, 24);
 
-                colors.querySelectorAll('div')[t.otherColorIdx].style.background = setOtherColor(t.r, t.g, t.b, (20 - t.quizIdx));
+                colors.querySelectorAll('div')[t.otherColorIdx].style.background = setOtherColor(t.r, t.g, t.b, (50 - t.quizIdx));
             }
 
 
@@ -155,65 +159,50 @@
 
                 const colors = qs('#colors');
 
-                if(idx == t.otherColorIdx){
+                if(idx == t.otherColorIdx || idx == 'hack'){
                     t.history.push({
                         color1: setColor(t.r, t.g, t.b),
                         color2: colors.querySelectorAll('div')[t.otherColorIdx].style.background,
                         time: new Date().getTime() - t.start
                     });
-                    if(t.quizIdx == 19){    //20문제 다 풀음
-                        t.stop = true;
-                        t.start = false;
-                        
-                        qs('aside').classList.add('on');
-                        qs('#colorMaster').classList.add('on');
-                        qs('#stageNum').innerText = t.quizIdx > 0 ? t.history.length : '없음';
-                        qs('#dur').innerText = t.quizIdx > 0 ? (t.history[t.history.length - 1].time / 1000) + '초' : '없음';
-
-
-                        qs('#colorDeco').innerHTML = '';
-                        t.history.forEach(function(el, idx){
-                            const div = document.createElement('div');
-                            const div2 = document.createElement('div');
-                            div.style.cssText = 'background: linear-gradient(-45deg, ' + el.color1 + ', #fff); left:' + (idx * 10) + 'px;';
-                            div2.style.cssText = 'background: linear-gradient(135deg, ' + el.color1 + ', #fff);';
-                            div2.innerHTML = (idx + 1);
-                            qs('#colorDeco').appendChild(div);
-                            div.appendChild(div2);
-                        });
+                    if(t.quizIdx == 49){    //20문제 다 풀음
+                        t.result(true);
 
                     }else{
                         t.quizIdx++;
                         t.startGame(true);
                     }
                 }else{
-                    // colors.querySelectorAll('div')[t.otherColorIdx].classList.add('correct');   //정답 표기
-                    
-                    t.stop = true;
-                    t.start = false;
-                    
-                    qs('aside').classList.add('on');
-                    qs('#stageNum').innerText = t.quizIdx > 0 ? t.history.length : '없음';
-                    qs('#dur').innerText = t.quizIdx > 0 ? (t.history[t.history.length - 1].time / 1000) + '초' : '없음';
-
-
-                    qs('#colorDeco').innerHTML = '';
-                    t.history.forEach(function(el, idx){
-                        const div = document.createElement('div');
-                        const div2 = document.createElement('div');
-                        div.style.cssText = 'background: linear-gradient(-45deg, ' + el.color1 + ', #fff); left:' + (idx * 10) + 'px;';
-                        div2.style.cssText = 'background: linear-gradient(135deg, ' + el.color1 + ', #fff); color: ' + el.color2 + ';';
-                        div2.innerHTML = (idx + 1);
-                        qs('#colorDeco').appendChild(div);
-                        div.appendChild(div2);
-                    });
-                    // if(confirm('처음부터 다시 진행할까요?')){
-                    //     t.init();
-                    //     t.startGame();
-                    // }else{
-
-                    // }
+                    t.result();
                 }
+            }
+
+            t.result = function(isEnd){
+                t.stop = true;
+                t.start = false;
+                
+                if(isEnd) qs('#colorMaster').classList.add('on');
+
+                qs('aside').classList.add('on');
+                qs('#stageNum').innerText = t.quizIdx > 0 ? t.history.length : '없음';
+                qs('#dur').innerText = t.quizIdx > 0 ? (t.history[t.history.length - 1].time / 1000) + '초' : '없음';
+
+
+                qs('#colorTokens').innerHTML = '';
+                t.history.forEach(function(el, idx){
+                    const div = document.createElement('div');
+                    const div2 = document.createElement('div');
+                    if(idx > 24){
+                        div.style.cssText = 'background: linear-gradient(-45deg, ' + el.color1 + ', #fff); top: 55px; left:' + ((idx - 25) * 8) + 'px;';
+                    }else{
+                        div.style.cssText = 'background: linear-gradient(-45deg, ' + el.color1 + ', #fff); left:' + (idx * 8) + 'px;';
+                    }
+                    div.classList.add('color-token');
+                    div2.style.cssText = 'background: linear-gradient(135deg, ' + el.color1 + ', #fff); color: ' + el.color2 + ';';
+                    div2.innerHTML = (idx + 1);
+                    qs('#colorTokens').appendChild(div);
+                    div.appendChild(div2);
+                });
             }
 
             t.init = function(){
