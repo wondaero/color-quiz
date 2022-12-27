@@ -15,7 +15,7 @@
         font-style: normal;
     }
 
-    /* body{opacity:.05;} */
+    body{opacity:.03;}
 
     /* body{font-family: 'UhBeeDongKyung';} */
     body{display: flex; align-items: center; justify-content: center;}
@@ -136,6 +136,8 @@
 
             t.history = [];
 
+            t.stage = 30;
+
             t.startGame = function(keep){
                 if(t.start !== false && keep === undefined) return;
                 
@@ -149,9 +151,9 @@
                 qs('#colors').classList.add('on');
                 qs('#guide').innerText = '이 중 다른 색을 찾아주세요.';
 
-                t.r = getRandomNum(80, 180);
-                t.g = getRandomNum(80, 180);
-                t.b = getRandomNum(80, 180);
+                t.r = getRandomNum((5 + t.stage), (250 - t.stage));
+                t.g = getRandomNum((5 + t.stage), (250 - t.stage));
+                t.b = getRandomNum((5 + t.stage), (250 - t.stage));
 
                 const qIdx = qs('#qIdx');
                 const colors = qs('#colors');
@@ -162,9 +164,9 @@
                     color.style.background = setColor(t.r, t.g, t.b);
                 });
 
-                t.otherColorIdx = getRandomNum(0, 24);
+                t.otherColorIdx = getRandomNum(0, 24);  //컬러갯수
 
-                colors.querySelectorAll('div')[t.otherColorIdx].style.background = setOtherColor([t.r, t.g, t.b], (50 - t.quizIdx), t.mode);
+                colors.querySelectorAll('div')[t.otherColorIdx].style.background = setOtherColor([t.r, t.g, t.b], (t.stage - t.quizIdx), t.mode);
             }
 
 
@@ -179,7 +181,7 @@
                         color2: colors.querySelectorAll('div')[t.otherColorIdx].style.background,
                         time: new Date().getTime() - t.start
                     });
-                    if(t.quizIdx == 49){    //20문제 다 풀음
+                    if(t.quizIdx == (t.stage - 1)){    //20문제 다 풀음
                         t.result(true);
 
                     }else{
@@ -207,11 +209,7 @@
                 t.history.forEach(function(el, idx){
                     const div = document.createElement('div');
                     const div2 = document.createElement('div');
-                    if(idx > 24){
-                        div.style.cssText = 'background: linear-gradient(-45deg, ' + el.color1 + ', #fff); top: 55px; left:' + ((idx - 25) * 8) + 'px;';
-                    }else{
-                        div.style.cssText = 'background: linear-gradient(-45deg, ' + el.color1 + ', #fff); left:' + (idx * 8) + 'px;';
-                    }
+                    div.style.cssText = 'background: linear-gradient(-45deg, ' + el.color1 + ', #fff); left:' + (idx * 6) + 'px;';
                     div.classList.add('color-token');
                     div2.style.cssText = 'background: linear-gradient(135deg, ' + el.color1 + ', #fff); color: ' + el.color2 + ';';
                     div2.innerHTML = (idx + 1);
