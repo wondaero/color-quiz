@@ -35,24 +35,34 @@
     .colors.on{display: flex;}
     .colors > div{
         width: 52px; height:52px; margin-right: 5px; border-radius: 50%; margin-bottom: 5px; cursor: pointer;
+        position: relative;
         /* transition: border 1s ease-in, background 1s ease-in; */
     }
     .colors > div:nth-child(5n){margin-right: 0;}
     .colors > div:nth-child(n + 21){margin-bottom: 0;}
 
-    .colors > div.correct{border-radius: 0;}
+    /* .colors > div.correct{border-radius: 0;} */
+    .colors > div.correct:after{
+        content: ''; position: absolute; top: 0; right: 0; width: 8px; height: 8px; background: linear-gradient(#f00, brown)red;
+        border-radius: 50%; box-shadow: 0 0 5px rgba(0, 0, 0, .5);
+    }
+    
 
-    aside{position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #fff; display: none; justify-content: center;}
+    aside{position: absolute; top: 0; left: 0; right: 0; background: 0; display: none; justify-content: center; padding-top: 320px;}
     aside.on{display: flex;}
 
-    aside > div{width: 250px; text-align: center; }
+    aside > div{width: 280px; text-align: center; }
     aside h2{display: none; margin: 0; margin-bottom: 5px;}
     aside h2.on{display: block;}
     aside h3, aside h4{margin: 0; margin-bottom: 5px;}
     aside h4{margin-bottom: 20px;}
-    aside .color-tokens{position: relative; height: 50px;}
-    aside .color-tokens > div{width: 50px; height: 50px; border-radius: 50%; position: absolute; top: 0; display: flex; align-items: center; justify-content: center;}
-    aside .color-tokens > div > div{
+    
+    aside .color-history{display: flex; align-items: center; justify-content: center;}
+    /* aside .dots{position: relative; top: 15px;} */
+    aside .dots .dot{width: 5px; height: 5px; border-radius: 50%; display: inline-block; margin-right: 2px;}
+    aside .token{position: relative; height: 50px; width: 50px;}
+    aside .token > div{width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;}
+    aside .token > div > div{
         width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900;
         text-shadow: 0 0 0px rgba(0, 0, 0, .5);
     }
@@ -99,10 +109,12 @@
             <aside>
                 <div>
                     <h2 id="colorMaster">당신은 컬러마스터!</h2>
-                    <!-- <h3>Stage <span id="stageNum"></span></h3> -->
                     <h3 id="mode">모드</h3>
                     <h4>소요시간: <span id="dur"></span></h4>
-                    <div id="colorTokens" class="color-tokens"></div>
+                    <div id="colorHistory" class="color-history">
+                        <div id="dots" class="dots"></div>
+                        <div id="token" class="token"></div>
+                    </div>
                 </div>
             </aside>
         </div>
@@ -181,7 +193,7 @@
                         color2: colors.querySelectorAll('div')[t.otherColorIdx].style.background,
                         time: new Date().getTime() - t.start
                     });
-                    if(t.quizIdx == (t.stage - 1)){    //20문제 다 풀음
+                    if(t.quizIdx == (t.stage - 1)){    //30문제 다 풀음
                         t.result(true);
 
                     }else{
@@ -199,27 +211,36 @@
                 
                 if(isEnd) qs('#colorMaster').classList.add('on');
 
+                colors.querySelectorAll('div')[t.otherColorIdx].classList.add('correct');
+
                 qs('aside').classList.add('on');
                 qs('#mode').innerText = t.quizIdx > 0 ? ('모드' + t.mode) : '없음';
-                // qs('#stageNum').innerText = t.quizIdx > 0 ? t.history.length : '없음';
                 qs('#dur').innerText = t.quizIdx > 0 ? (t.history[t.history.length - 1].time / 1000) + '초' : '없음';
 
 
-                qs('#colorTokens').innerHTML = '';
+                qs('#token').innerHTML = '';
+                qs('#dots').innerHTML = '';
+                
                 t.history.forEach(function(el, idx){
-                    const div = document.createElement('div');
-                    const div2 = document.createElement('div');
-                    div.style.cssText = 'background: linear-gradient(-45deg, ' + el.color1 + ', #fff); left:' + (idx * 6) + 'px;';
-                    div.classList.add('color-token');
-                    div2.style.cssText = 'background: linear-gradient(135deg, ' + el.color1 + ', #fff); color: ' + el.color2 + ';';
-                    div2.innerHTML = (idx + 1);
-                    qs('#colorTokens').appendChild(div);
-                    div.appendChild(div2);
+                    if(idx == t.history.length - 1){
+                        const div = document.createElement('div');
+                        const div2 = document.createElement('div');
+                        div.style.cssText = 'background: linear-gradient(-45deg, ' + el.color1 + ', #fff);';
+                        div2.style.cssText = 'background: linear-gradient(135deg, ' + el.color1 + ', #fff); color: ' + el.color2 + ';';
+                        div2.innerHTML = (idx + 1);
+                        div.appendChild(div2);
+                        qs('#token').appendChild(div);
+                    }else{
+                        const div = document.createElement('div');
+                        div.style.background = el.color1;
+                        div.classList.add('dot');
+                        qs('#dots').appendChild(div);
+                    }
                 });
             }
 
             t.init = function(){
-                // colors.querySelectorAll('div')[t.otherColorIdx].classList.remove('correct');
+                colors.querySelectorAll('div')[t.otherColorIdx].classList.remove('correct');
                 qs('aside').classList.remove('on');
                 qs('#colors').classList.add('on');
 
@@ -261,6 +282,7 @@
         function getRandomNum(mn, mx){return Math.floor(Math.random() * (mx - mn + 1)) + mn;};
 
         function setColor(r, g, b){return 'rgb(' + r + ', ' + g + ', ' + b + ')';}
+
     </script>
 
 
