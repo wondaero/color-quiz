@@ -15,7 +15,10 @@
         font-style: normal;
     }
 
-    html, body{background: #000; color: #fff;}
+    /*body{opacity: .05;}*/
+
+    html.light, body.light{}
+    html.dark, body.dark{background: #000; color: #fff;}
 
     /* body{font-family: 'UhBeeDongKyung';} */
     body{display: flex; align-items: center; justify-content: center;}
@@ -23,7 +26,6 @@
 
     header{padding: 10px 0; text-align: right;}
     header button{outline: 0; border: 0; border-radius: 3px; width: 60px; padding: 5px; box-sizing: border-box; color: #fff; font-weight: 900;}
-    .home{background: green;}
     .init{background: red;}
     .start{background: blue;}
 
@@ -73,7 +75,6 @@
     <div class="wrapper">
         <header>
             <button class="home" onclick="colorGame.goHome();">홈</button>
-            <button class="init" onclick="colorGame.reload();">초기화</button>
             <button class="start" onclick="colorGame.startGame();">시작</button>
         </header>
         <div class="content">
@@ -109,8 +110,8 @@
 
             <aside>
                 <div>
-                    <h2 id="colorMaster">당신은 컬러마스터!</h2>
-                    <h3 id="mode">모드</h3>
+                    <h2 id="colorMaster">당신이 군계일학!</h2>
+                    <h3 id="mode_ver">모드 ver.</h3>
                     <h4>소요시간: <span id="dur"></span></h4>
                     <div id="colorHistory" class="color-history">
                         <div id="dots" class="dots"></div>
@@ -122,18 +123,38 @@
     </div>
 
     <script>
-        const query = location.search.substr(1).split('=');
-        if(query[0] !== 'mode' || 0 >= +query[1] || query[1] > 3){
+        const strQry = location.search.substr(1);
+        const qryArr = strQry.split('&');
+        const qryObj = {};
+        qryArr.forEach(function(qry){
+            const qry2arr = qry.split('=');
+            qryObj[qry2arr[0]] = qry2arr[1];
+        });
+
+        function isValidPage(){
+            let mode = false;
+            let ver = false;
+
+            if(qryObj.mode === 'dark' || qryObj.mode === 'light') mode = true;
+            if(qryObj.ver === '1' || qryObj.ver === '2' || qryObj.ver === '3') ver = true;
+
+            return (mode && ver);
+        }
+
+        if(!isValidPage(qryObj)){
             alert('잘못된 접근입니다.');
             location.href = './index.html';
         }
 
         const qs = function(t){return document.querySelector(t);}
         const qsa = function(t){return document.querySelectorAll(t);}
+
+        qs('body').classList.add(qryObj.mode);
         
         const colorGame = new Color();
 
-        colorGame.mode = query[1];
+        colorGame.mode = qryObj.mode;
+        colorGame.ver = qryObj.ver;
 
 
         function Color(){
@@ -146,6 +167,7 @@
             t.stop = false;
 
             t.mode = '';
+            t.ver = '';
 
             t.history = [];
 
@@ -164,9 +186,14 @@
                 qs('#colors').classList.add('on');
                 qs('#guide').innerText = '이 중 다른 색을 찾아주세요.';
 
-                const mnColor = 50;
-                const mxColor = 200;
-
+                let mnColor = 50;
+                let mxColor = 200;
+                
+                if(t.mode == 'light'){
+                    mnColor = 5;
+                    mxColor = 250;
+                }
+                
                 t.r = getRandomNum((mnColor + t.stage), (mxColor - t.stage));
                 t.g = getRandomNum((mnColor + t.stage), (mxColor - t.stage));
                 t.b = getRandomNum((mnColor + t.stage), (mxColor - t.stage));
@@ -182,7 +209,7 @@
 
                 t.otherColorIdx = getRandomNum(0, 24);  //컬러갯수
 
-                colors.querySelectorAll('div')[t.otherColorIdx].style.background = setOtherColor([t.r, t.g, t.b], (t.stage - t.quizIdx), t.mode);
+                colors.querySelectorAll('div')[t.otherColorIdx].style.background = setOtherColor([t.r, t.g, t.b], (t.stage - t.quizIdx), t.ver);
             }
 
 
@@ -218,7 +245,7 @@
                 colors.querySelectorAll('div')[t.otherColorIdx].classList.add('correct');
 
                 qs('aside').classList.add('on');
-                qs('#mode').innerText = t.quizIdx > 0 ? ('모드' + t.mode) : '없음';
+                qs('#mode_ver').innerText = (t.mode == 'light' ? '라이트' : '다크') + '모드 ver.' + t.ver; 
                 qs('#dur').innerText = t.quizIdx > 0 ? (t.history[t.history.length - 1].time / 1000) + '초' : '없음';
 
 
@@ -247,6 +274,7 @@
                 colors.querySelectorAll('div')[t.otherColorIdx].classList.remove('correct');
                 qs('aside').classList.remove('on');
                 qs('#colors').classList.add('on');
+                qs('#colorMaster').classList.add('on')
 
                 t.start = t.end = t.stop = false;
                 t.otherColorIdx = t.quizIdx = 0;
@@ -254,28 +282,23 @@
                 t.history = [];
             }
 
-            t.reload = function(){
-                if(confirm('페이지를 다시 불러올까요?')) location.reload();
-            }
-
             t.goHome = function(){
                 if(confirm('초기화면으로 돌아갈까요?')) location.href = './index.html';
             }
-
         }
 
-        function setOtherColor(arr, val, mode){
+        function setOtherColor(arr, val, ver){
             const valArr = [-val, val];
             const addVal = valArr[getRandomNum(0, 1)];
 
             const exColor = getRandomNum(0, 2);
 
             for(let i = 0; i < arr.length; i++){
-                if(mode == 1){ 
+                if(ver == 1){ 
                     arr[i] += addVal;
-                }else if(mode == 2){
+                }else if(ver == 2){
                     if(exColor != i) arr[i] += addVal;
-                }else if(mode == 3){
+                }else if(ver == 3){
                     if(exColor == i) arr[i] += addVal;
                 }
             }
