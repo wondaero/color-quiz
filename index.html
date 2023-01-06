@@ -21,8 +21,9 @@
     html, body{height: 100%;}
 
     .wrapper{height: 100%; position: relative;}
+
     .logo{
-        position: absolute; top: 30px; left: 50%; transform: translateX(-50%);
+        position: absolute; top: 50px; left: 50%; transform: translateX(-50%);
         margin: 0; padding: 0; display: flex; align-items: center; justify-content: center;
     }
     .logo_img{display: flex; flex-wrap: wrap; margin-right: 10px; width: 25px; transform: rotate(15deg);}
@@ -32,12 +33,13 @@
     .logo_img > span:nth-child(n + 3){margin-bottom: 0;}
     .logo_txt{color: rgb(80, 80, 80);}
 
-    .btns{position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); list-style: none; margin: 0; padding: 0;}
-    .btns h3{padding: 0; margin: 0;}
-    .btns ul{list-style: none; margin: 0; margin-bottom: 10px; padding: 0;}
+    footer{position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);}
+    .btns{text-align: center;}
+    .btns h3{padding: 0; margin: 0; text-align: left;}
+    .btns ul{list-style: none; margin: 0; margin-bottom: 10px; padding: 0; display: inline-flex;}
     .btns ul:last-child{margin-bottom: 0;}
-    .btns ul li{display: inline-block;}
-    .btns ul li:last-child{margin-bottom: 0;}
+    .btns ul li{margin-right: 10px;}
+    .btns ul li:last-child{margin-right: 0;}
     .btns a{
         text-decoration: none; width: 50px; height: 50px; color: #333;
         display: inline-flex; align-items: center; justify-content: center; font-size: 36px;
@@ -55,10 +57,14 @@
     }
     .lock:before{content: ''; display: block; position: absolute; bottom: 0; width: 100%; height: 60%; background: #000;}
 
+    .warning{background: rgb(255, 162, 162); padding: 10px; margin: 0; margin-top: 10px; word-break: keep-all; color: rgb(226, 60, 60);}
+
+    .size{position: absolute; top: 5px; right: 5px; background: rgba(0, 0, 0, .5); color: #fff; padding: 5px;}
 
 </style>
 <body>
     <div class="wrapper">
+        <aside class="size"></aside>
         <h1 class="logo">
             <span class="logo_img">
                 <span></span>
@@ -68,31 +74,37 @@
             </span>
             <span class="logo_txt">Colors</span>
         </h1>
-        <div class="btns">
-            <div class="light-mode mode">
-                <h3>라이트모드</h3>
-                <ul>
-                    <li><a href="game.html?mode=light&ver=1">1</a></li>
-                    <li><a href="game.html?mode=light&ver=2">2</a></li>
-                    <li><a href="game.html?mode=light&ver=3">3</a></li>
-                    <!-- <li><a href="#">랭킹 <span class="lock"></span></a></li> -->
-                </ul>
+        <footer>
+            <div class="btns">
+                <div class="light-mode mode">
+                    <h3>라이트모드</h3>
+                    <ul>
+                        <li><a href="game.html?mode=light&ver=1">1</a></li>
+                        <li><a href="game.html?mode=light&ver=2">2</a></li>
+                        <li><a href="game.html?mode=light&ver=3">3</a></li>
+                        <!-- <li><a href="#">랭킹 <span class="lock"></span></a></li> -->
+                    </ul>
+                </div>
+                <div class="dark-mode mode">
+                    <h3>다크모드</h3>
+                    <ul>
+                        <li><a href="game.html?mode=dark&ver=1">1</a></li>
+                        <li><a href="game.html?mode=dark&ver=2">2</a></li>
+                        <li><a href="game.html?mode=dark&ver=3">3</a></li>
+                        <!-- <li><a href="#">랭킹 <span class="lock"></span></a></li> -->
+                    </ul>
+                </div>
             </div>
-            <div class="dark-mode mode">
-                <h3>다크모드</h3>
-                <ul>
-                    <li><a href="game.html?mode=dark&ver=1">1</a></li>
-                    <li><a href="game.html?mode=dark&ver=2">2</a></li>
-                    <li><a href="game.html?mode=dark&ver=3">3</a></li>
-                    <!-- <li><a href="#">랭킹 <span class="lock"></span></a></li> -->
-                </ul>
-            </div>
-        </div>
+    
+            <h4 class="warning">장시간 이용은 눈건강에 해롭습니다.</h4>
+        </fotter>
     </div>
 
-    <script></script>
+    <script>
+        const w = window.innerWidth;
+        const h = window.innerHeight;
 
-
-
+        document.querySelector('aside').innerText = w + ' * ' + h;
+    </script>
 </body>
 </html>
